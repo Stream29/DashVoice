@@ -9,6 +9,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
@@ -39,6 +40,7 @@ class DashVoiceInputMethodService : InputMethodService() {
 
     private lateinit var viewTreeOwners: ImeViewTreeOwners
     private lateinit var viewModel: VoiceImeViewModel
+    private lateinit var inputView: ComposeView
 
     override fun onCreate() {
         super.onCreate()
@@ -48,6 +50,7 @@ class DashVoiceInputMethodService : InputMethodService() {
             viewTreeOwners,
             (application as DashVoiceApplication).container.viewModelFactory,
         )[VoiceImeViewModel::class.java]
+        inputView = createInputView()
         serviceScope.launch {
             viewModel.effects.collect(::handleEffect)
         }
@@ -56,8 +59,17 @@ class DashVoiceInputMethodService : InputMethodService() {
     override fun onCreateInputView(): View {
         window.window?.setWindowAnimations(0)
         window.window?.decorView?.installViewTreeOwners()
-        return ComposeView(this).apply {
+        return inputView
+    }
+
+    private fun createInputView(): ComposeView =
+        ComposeView(this).apply {
             installViewTreeOwners()
+            setViewCompositionStrategy(
+                ViewCompositionStrategy.DisposeOnLifecycleDestroyed(
+                    viewTreeOwners,
+                ),
+            )
             setContent {
                 val state by viewModel.uiState.collectAsStateWithLifecycle()
                 DashVoiceTheme {
@@ -70,7 +82,6 @@ class DashVoiceInputMethodService : InputMethodService() {
                 }
             }
         }
-    }
 
     private fun View.installViewTreeOwners() {
         setViewTreeLifecycleOwner(viewTreeOwners)
