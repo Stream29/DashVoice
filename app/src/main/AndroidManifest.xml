@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+
+    <uses-feature
+        android:name="android.hardware.microphone"
+        android:required="true"/>
+
+    <queries>
+        <intent>
+            <action android:name="android.speech.RecognitionService"/>
+        </intent>
+    </queries>
+
+    <application
+        android:name=".DashVoiceApplication"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.DashVoice"
+        android:usesCleartextTraffic="false">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".recognition.RecognitionActivity"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:label="@string/recognition_activity_label">
+            <intent-filter>
+                <action android:name="android.speech.action.RECOGNIZE_SPEECH"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="android.speech.DETAILS"
+                android:value="io.github.stream29.dashvoice.recognition.LanguageDetailsReceiver"/>
+        </activity>
+
+        <service
+            android:name=".recognition.DashVoiceRecognitionService"
+            android:description="@string/recognition_service_description"
+            android:exported="true"
+            android:label="@string/recognition_service_label"
+            android:permission="android.permission.RECORD_AUDIO">
+            <intent-filter>
+                <action android:name="android.speech.RecognitionService"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="android.speech"
+                android:resource="@xml/recognition_service"/>
+        </service>
+
+        <service
+            android:name=".ime.DashVoiceInputMethodService"
+            android:exported="true"
+            android:label="@string/voice_ime_label"
+            android:permission="android.permission.BIND_INPUT_METHOD">
+            <intent-filter>
+                <action android:name="android.view.InputMethod"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="android.view.im"
+                android:resource="@xml/input_method"/>
+        </service>
+
+        <receiver
+            android:name=".recognition.LanguageDetailsReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.speech.action.GET_LANGUAGE_DETAILS"/>
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>

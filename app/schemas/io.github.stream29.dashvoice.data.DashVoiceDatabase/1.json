@@ -1,0 +1,55 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "581a66d1d9d3f0811e23913290424e4f",
+    "entities": [
+      {
+        "tableName": "configuration",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`singleton_id` INTEGER NOT NULL, `api_key` TEXT NOT NULL, `base_url` TEXT NOT NULL, `language` TEXT NOT NULL, `vad_preset` TEXT NOT NULL, PRIMARY KEY(`singleton_id`))",
+        "fields": [
+          {
+            "fieldPath": "singletonId",
+            "columnName": "singleton_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "apiKey",
+            "columnName": "api_key",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "baseUrl",
+            "columnName": "base_url",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "language",
+            "columnName": "language",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "vadPreset",
+            "columnName": "vad_preset",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "singleton_id"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '581a66d1d9d3f0811e23913290424e4f')"
+    ]
+  }
+}

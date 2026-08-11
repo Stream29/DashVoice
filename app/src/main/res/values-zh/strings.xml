@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">DashVoice</string>
+    <string name="recognition_activity_label">DashVoice 语音输入</string>
+    <string name="recognition_service_label">DashVoice 在线语音识别</string>
+    <string name="recognition_service_description">使用阿里云百炼实时语音识别，将语音转换为文字。</string>
+    <string name="voice_ime_label">DashVoice 语音输入</string>
+    <string name="voice_ime_subtype_label">DashVoice 一次性语音输入</string>
+
+    <string name="section_status">状态</string>
+    <string name="status_loading_configuration">正在读取 Room 配置</string>
+    <string name="status_dashscope_configuration">DashScope 配置</string>
+    <string name="status_ready">可用</string>
+    <string name="status_incomplete">未完成</string>
+    <string name="status_microphone_permission">麦克风权限</string>
+    <string name="status_granted">已授予</string>
+    <string name="status_not_granted">未授予</string>
+    <string name="action_grant_microphone">授予麦克风权限</string>
+    <string name="status_model">模型：%1$s</string>
+    <string name="section_dashscope_configuration">DashScope 配置</string>
+    <string name="action_hide">隐藏</string>
+    <string name="action_show">显示</string>
+    <string name="base_url_help">填写业务空间的 wss:// 实时接口地址；应用会自动补充 model 参数。</string>
+    <string name="language_automatic">语言：自动识别</string>
+    <string name="vad_settings_title">语音结束判定</string>
+    <string name="vad_silence_duration_label">结束静音时长（ms）</string>
+    <string name="vad_silence_duration_help">范围 200–6000 ms。数值越小结束越快；越大越能容忍自然停顿。</string>
+    <string name="vad_threshold_label">VAD 灵敏度阈值</string>
+    <string name="vad_threshold_help">范围 -1.0–1.0。数值越低越敏感；越高越能排除背景噪声。</string>
+    <string name="section_recognition_test">识别测试</string>
+    <string name="detected_language">检测语言：%1$s</string>
+    <string name="action_test_again">再次测试</string>
+    <string name="action_start_test">开始测试</string>
+    <string name="action_finish">完成</string>
+    <string name="section_connect_ime">接入输入法</string>
+    <string name="setup_step_1">1. 先在上方完成识别测试。</string>
+    <string name="setup_step_2">2. 打开系统“语音输入”设置并选择 DashVoice。</string>
+    <string name="setup_step_3">3. 如果输入法启动的是识别 Activity，在选择器中将 DashVoice 设为默认。</string>
+    <string name="action_open_voice_input_settings">打开系统语音输入设置</string>
+
+    <string name="action_cancel">取消</string>
+    <string name="action_open_settings">打开设置</string>
+    <string name="action_retry">重试</string>
+    <string name="ime_return_keyboard">返回键盘</string>
+    <string name="ime_open_settings">打开 DashVoice 设置</string>
+    <string name="ime_stop_voice_input">结束语音输入</string>
+    <string name="ime_voice_input_status">语音输入状态</string>
+    <string name="ime_return_failed">无法自动返回上一输入法</string>
+
+    <string name="recognition_title_listening">请开始说话</string>
+    <string name="recognition_guidance_automatic_language">会自动识别所说的语言</string>
+    <string name="recognition_title_speaking">正在聆听</string>
+    <string name="recognition_guidance_auto_finish">停顿后会自动完成</string>
+    <string name="recognition_title_processing">正在整理文字</string>
+    <string name="recognition_title_idle">尚未测试</string>
+    <string name="recognition_guidance_idle">完成配置后可直接测试语音识别。</string>
+    <string name="recognition_title_connecting">正在连接 DashScope</string>
+    <string name="recognition_guidance_connecting">首次连接可能需要几秒钟</string>
+    <string name="recognition_title_success">识别成功</string>
+
+    <string name="recognition_error_permission">没有麦克风权限</string>
+    <string name="recognition_error_permission_guidance">请授予录音权限后重试。</string>
+    <string name="recognition_error_network">无法连接语音服务</string>
+    <string name="recognition_error_network_guidance">请检查网络连接和 Base URL 后重试。</string>
+    <string name="recognition_error_server">DashScope 拒绝了请求</string>
+    <string name="recognition_error_server_guidance">请检查 API Key 和 Base URL。</string>
+    <string name="recognition_error_audio">无法读取麦克风</string>
+    <string name="recognition_error_audio_guidance">请确认没有其他应用占用麦克风。</string>
+    <string name="recognition_error_speech_timeout">没有检测到语音</string>
+    <string name="recognition_error_speech_timeout_guidance">请靠近麦克风后重试。</string>
+    <string name="recognition_error_no_match">没有识别到文字</string>
+    <string name="recognition_error_no_match_guidance">请重试并说得更清楚一些。</string>
+    <string name="recognition_error_busy">语音识别正在使用中</string>
+    <string name="recognition_error_busy_guidance">请稍后重试。</string>
+    <string name="recognition_error_language">无法自动识别所说的语言</string>
+    <string name="recognition_error_language_guidance">请改用中文或英文后重试。</string>
+    <string name="recognition_error_client">语音识别未能启动</string>
+    <string name="recognition_error_client_guidance">请关闭其他语音输入后重试。</string>
+    <string name="recognition_error_other">语音识别失败</string>
+    <string name="recognition_error_code">错误代码：%1$d</string>
+    <string name="recognition_error_read_configuration">无法读取配置</string>
+    <string name="recognition_error_read_configuration_guidance">请打开 DashVoice 设置后重新填写配置。</string>
+    <string name="recognition_error_incomplete_configuration">尚未完成 DashScope 配置</string>
+    <string name="recognition_error_incomplete_configuration_guidance">请先填写 API Key 和 Base URL。</string>
+
+    <string name="settings_error_read_room">无法读取 Room 配置。</string>
+    <string name="settings_saved">配置已保存。</string>
+    <string name="settings_validation_api_key">请输入 DashScope API Key。</string>
+    <string name="settings_validation_base_url">请输入有效的 wss:// Base URL。</string>
+    <string name="settings_validation_vad_threshold">VAD 灵敏度阈值必须介于 -1.0 与 1.0。</string>
+    <string name="settings_validation_silence_duration">结束静音时长必须介于 200 与 6000 ms。</string>
+    <string name="settings_error_save_room">保存 Room 配置失败。</string>
+</resources>

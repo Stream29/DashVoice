@@ -1,0 +1,69 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "f0d39b1497e786833e72e6b87bc5825e",
+    "entities": [
+      {
+        "tableName": "configuration",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`singleton_id` INTEGER NOT NULL, `api_key` TEXT NOT NULL, `base_url` TEXT NOT NULL, `language` TEXT NOT NULL, `vad_preset` TEXT NOT NULL, `vad_threshold` REAL NOT NULL DEFAULT 0.0, `silence_duration_ms` INTEGER NOT NULL DEFAULT 400, PRIMARY KEY(`singleton_id`))",
+        "fields": [
+          {
+            "fieldPath": "singletonId",
+            "columnName": "singleton_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "apiKey",
+            "columnName": "api_key",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "baseUrl",
+            "columnName": "base_url",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "language",
+            "columnName": "language",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "vadPreset",
+            "columnName": "vad_preset",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "vadThreshold",
+            "columnName": "vad_threshold",
+            "affinity": "REAL",
+            "notNull": true,
+            "defaultValue": "0.0"
+          },
+          {
+            "fieldPath": "silenceDurationMillis",
+            "columnName": "silence_duration_ms",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "400"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "singleton_id"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f0d39b1497e786833e72e6b87bc5825e')"
+    ]
+  }
+}

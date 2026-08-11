@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">DashVoice</string>
+    <string name="recognition_activity_label">DashVoice voice input</string>
+    <string name="recognition_service_label">DashVoice online speech recognition</string>
+    <string name="recognition_service_description">Converts speech to text with Alibaba Cloud Model Studio realtime
+        speech recognition.
+    </string>
+    <string name="voice_ime_label">DashVoice voice input</string>
+    <string name="voice_ime_subtype_label">DashVoice one-shot voice input</string>
+
+    <string name="section_status">Status</string>
+    <string name="status_loading_configuration">Loading Room configuration</string>
+    <string name="status_dashscope_configuration">DashScope configuration</string>
+    <string name="status_ready">Ready</string>
+    <string name="status_incomplete">Incomplete</string>
+    <string name="status_microphone_permission">Microphone permission</string>
+    <string name="status_granted">Granted</string>
+    <string name="status_not_granted">Not granted</string>
+    <string name="action_grant_microphone">Grant microphone permission</string>
+    <string name="status_model">Model: %1$s</string>
+    <string name="section_dashscope_configuration">DashScope configuration</string>
+    <string name="action_hide">Hide</string>
+    <string name="action_show">Show</string>
+    <string name="base_url_help">Enter the workspace wss:// realtime endpoint. The model parameter is added
+        automatically.
+    </string>
+    <string name="language_automatic">Language: Automatic detection</string>
+    <string name="vad_settings_title">Voice endpoint detection</string>
+    <string name="vad_silence_duration_label">End-of-speech silence (ms)</string>
+    <string name="vad_silence_duration_help">200–6000 ms. Lower values finish sooner; higher values tolerate natural
+        pauses.
+    </string>
+    <string name="vad_threshold_label">VAD threshold</string>
+    <string name="vad_threshold_help">-1.0–1.0. Lower values are more sensitive; higher values reject more background
+        noise.
+    </string>
+    <string name="section_recognition_test">Recognition test</string>
+    <string name="detected_language">Detected language: %1$s</string>
+    <string name="action_test_again">Test again</string>
+    <string name="action_start_test">Start test</string>
+    <string name="action_finish">Finish</string>
+    <string name="section_connect_ime">Connect to keyboard</string>
+    <string name="setup_step_1">1. Complete the recognition test above.</string>
+    <string name="setup_step_2">2. Open the system Voice input settings and select DashVoice.</string>
+    <string name="setup_step_3">3. If the keyboard starts a recognition Activity, set DashVoice as the default in its
+        selector.
+    </string>
+    <string name="action_open_voice_input_settings">Open system Voice input settings</string>
+
+    <string name="action_cancel">Cancel</string>
+    <string name="action_open_settings">Open settings</string>
+    <string name="action_retry">Retry</string>
+    <string name="ime_return_keyboard">Return to keyboard</string>
+    <string name="ime_open_settings">Open DashVoice settings</string>
+    <string name="ime_stop_voice_input">Finish voice input</string>
+    <string name="ime_voice_input_status">Voice input status</string>
+    <string name="ime_return_failed">Could not return to the previous keyboard automatically</string>
+
+    <string name="recognition_title_listening">Start speaking</string>
+    <string name="recognition_guidance_automatic_language">The spoken language is detected automatically</string>
+    <string name="recognition_title_speaking">Listening</string>
+    <string name="recognition_guidance_auto_finish">Finishes automatically after a pause</string>
+    <string name="recognition_title_processing">Preparing text</string>
+    <string name="recognition_title_idle">Not tested yet</string>
+    <string name="recognition_guidance_idle">Complete the configuration to test speech recognition.</string>
+    <string name="recognition_title_connecting">Connecting to DashScope</string>
+    <string name="recognition_guidance_connecting">The first connection may take a few seconds</string>
+    <string name="recognition_title_success">Recognition succeeded</string>
+
+    <string name="recognition_error_permission">Microphone permission is missing</string>
+    <string name="recognition_error_permission_guidance">Grant microphone permission and try again.</string>
+    <string name="recognition_error_network">Could not connect to the speech service</string>
+    <string name="recognition_error_network_guidance">Check the network connection and Base URL, then try again.
+    </string>
+    <string name="recognition_error_server">DashScope rejected the request</string>
+    <string name="recognition_error_server_guidance">Check the API Key and Base URL.</string>
+    <string name="recognition_error_audio">Could not read the microphone</string>
+    <string name="recognition_error_audio_guidance">Make sure another app is not using the microphone.</string>
+    <string name="recognition_error_speech_timeout">No speech was detected</string>
+    <string name="recognition_error_speech_timeout_guidance">Move closer to the microphone and try again.</string>
+    <string name="recognition_error_no_match">No text was recognized</string>
+    <string name="recognition_error_no_match_guidance">Try again and speak more clearly.</string>
+    <string name="recognition_error_busy">Speech recognition is already in use</string>
+    <string name="recognition_error_busy_guidance">Try again shortly.</string>
+    <string name="recognition_error_language">The spoken language could not be detected</string>
+    <string name="recognition_error_language_guidance">Try again in Chinese or English.</string>
+    <string name="recognition_error_client">Speech recognition could not start</string>
+    <string name="recognition_error_client_guidance">Close other voice input sessions and try again.</string>
+    <string name="recognition_error_other">Speech recognition failed</string>
+    <string name="recognition_error_code">Error code: %1$d</string>
+    <string name="recognition_error_read_configuration">Could not read the configuration</string>
+    <string name="recognition_error_read_configuration_guidance">Open DashVoice settings and enter the configuration
+        again.
+    </string>
+    <string name="recognition_error_incomplete_configuration">DashScope configuration is incomplete</string>
+    <string name="recognition_error_incomplete_configuration_guidance">Enter the API Key and Base URL first.</string>
+
+    <string name="settings_error_read_room">Could not read the Room configuration.</string>
+    <string name="settings_saved">Configuration saved.</string>
+    <string name="settings_validation_api_key">Enter a DashScope API Key.</string>
+    <string name="settings_validation_base_url">Enter a valid wss:// Base URL.</string>
+    <string name="settings_validation_vad_threshold">VAD threshold must be between -1.0 and 1.0.</string>
+    <string name="settings_validation_silence_duration">End-of-speech silence must be between 200 and 6000 ms.</string>
+    <string name="settings_error_save_room">Could not save the Room configuration.</string>
+</resources>
