@@ -20,7 +20,7 @@
     <string name="section_dashscope_configuration">DashScope 配置</string>
     <string name="action_hide">隐藏</string>
     <string name="action_show">显示</string>
-    <string name="base_url_help">填写业务空间的 wss:// 实时接口地址；应用会自动补充 model 参数。</string>
+    <string name="base_url_help">填写业务空间的 wss:// 接口地址；DashVoice 会使用 /api-ws/v1/inference 路径。</string>
     <string name="language_automatic">语言：自动识别</string>
     <string name="vad_settings_title">语音结束判定</string>
     <string name="vad_silence_duration_label">结束静音时长（ms）</string>

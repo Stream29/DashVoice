@@ -236,7 +236,7 @@ private fun ConfigurationSection(
             enabled = !state.isLoading,
             label = { Text("Base URL") },
             placeholder = {
-                Text("wss://…/api-ws/v1/realtime")
+                Text("wss://…/api-ws/v1/inference")
             },
             supportingText = {
                 Text(stringResource(R.string.base_url_help))
@@ -431,7 +431,7 @@ private fun SettingsScreenPreview() {
             state = SettingsUiState(
                 isLoading = false,
                 apiKey = "sk-example",
-                baseUrl = "wss://workspace.ap-southeast-1.maas.aliyuncs.com/api-ws/v1/realtime",
+                baseUrl = "wss://workspace.ap-southeast-1.maas.aliyuncs.com/api-ws/v1/inference",
                 microphonePermissionGranted = true,
             ),
             onApiKeyChanged = {},

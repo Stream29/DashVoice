@@ -9,6 +9,7 @@ import android.media.MediaRecorder
 import android.os.Build
 import android.util.Log
 import io.github.stream29.dashvoice.data.DashVoiceSettings
+import io.github.stream29.dashvoice.recognition.TranscriptNormalizer
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.HttpRequestTimeoutException
@@ -98,18 +99,29 @@ internal class DashScopeRealtimeSession(
                     header(HttpHeaders.UserAgent, "DashVoice/0.1.0 Android")
                 }
                 try {
-                    val outgoing = Channel<DashScopeClientEvent>(Channel.UNLIMITED)
+                    val taskId = DashScopeProtocol.newTaskId()
+                    val outgoing = Channel<OutboundMessage>(Channel.UNLIMITED)
                     val writer = launch {
-                        outgoing.receiveAsFlow().collect(socket::sendSerialized)
+                        outgoing.receiveAsFlow().collect { message ->
+                            when (message) {
+                                is OutboundMessage.Command -> socket.sendSerialized(message.command)
+                                is OutboundMessage.Audio -> {
+                                    socket.send(Frame.Binary(fin = true, data = message.bytes))
+                                }
+                            }
+                        }
                     }
                     try {
                         outgoing.send(
-                            DashScopeProtocol.sessionUpdate(
-                                vadThreshold = settings.vadThreshold,
-                                silenceDurationMillis = settings.silenceDurationMillis,
+                            OutboundMessage.Command(
+                                DashScopeProtocol.runTask(
+                                    taskId = taskId,
+                                    vadThreshold = settings.vadThreshold,
+                                    silenceDurationMillis = settings.silenceDurationMillis,
+                                ),
                             ),
                         )
-                        when (runEventLoop(socket, events, outgoing, audioCapture)) {
+                        when (runEventLoop(socket, events, outgoing, audioCapture, taskId)) {
                             LoopEnd.FINISHED -> {
                                 outgoing.close()
                                 writer.join()
@@ -171,8 +183,9 @@ internal class DashScopeRealtimeSession(
     private suspend fun CoroutineScope.runEventLoop(
         socket: DefaultClientWebSocketSession,
         events: SendChannel<Event>,
-        outgoing: SendChannel<DashScopeClientEvent>,
+        outgoing: SendChannel<OutboundMessage>,
         audioCapture: AudioCapture,
+        taskId: String,
     ): LoopEnd {
         var state = SessionState()
         var audioSenderJob: Job? = null
@@ -183,9 +196,8 @@ internal class DashScopeRealtimeSession(
             audioSenderJob = launch {
                 for (frame in audioCapture.frames) {
                     outgoing.send(
-                        DashScopeProtocol.appendAudio(
-                            audio = frame.bytes,
-                            length = frame.bytes.size,
+                        OutboundMessage.Audio(
+                            bytes = frame.bytes,
                         ),
                     )
                 }
@@ -198,7 +210,11 @@ internal class DashScopeRealtimeSession(
             if (state.configured && !state.finishSent) {
                 startAudioSender()
                 audioSenderJob?.join()
-                outgoing.send(DashScopeProtocol.finish())
+                outgoing.send(
+                    OutboundMessage.Command(
+                        DashScopeProtocol.finishTask(taskId),
+                    ),
+                )
                 state = state.copy(finishSent = true)
             }
         }
@@ -221,8 +237,7 @@ internal class DashScopeRealtimeSession(
 
                     is SessionInput.ServerEvent -> {
                         when (val event = input.event) {
-                            DashScopeServerEvent.SessionCreated -> Unit
-                            DashScopeServerEvent.SessionUpdated -> {
+                            DashScopeServerEvent.TaskStarted -> {
                                 state = state.copy(configured = true)
                                 startAudioSender()
                                 if (state.finishRequested) {
@@ -230,40 +245,31 @@ internal class DashScopeRealtimeSession(
                                 }
                             }
 
-                            DashScopeServerEvent.SpeechStarted -> {
-                                if (!state.speechDetected) {
+                            is DashScopeServerEvent.Transcript -> {
+                                if (event.heartbeat) return@all true
+                                if (event.text.isNotBlank() && !state.speechDetected) {
                                     state = state.copy(speechDetected = true)
                                     events.send(Event.BeginningOfSpeech)
                                 }
-                            }
-
-                            DashScopeServerEvent.SpeechStopped -> {
-                                events.send(Event.EndOfSpeech)
-                                requestFinish()
-                            }
-
-                            is DashScopeServerEvent.PartialTranscript -> {
-                                state = state.withLanguage(event.language)
+                                if (event.sentenceEnd) {
+                                    state = state.appendCompleted(event.text)
+                                }
                                 events.send(
                                     Event.PartialTranscript(
-                                        transcript = state.completedText +
-                                            event.text +
-                                            event.stash,
-                                        language = state.detectedLanguage,
+                                        transcript = if (event.sentenceEnd) {
+                                            state.completedText
+                                        } else {
+                                            TranscriptNormalizer.normalize(
+                                                state.completedText + event.text,
+                                            )
+                                        },
+                                        language = null,
                                     ),
                                 )
-                            }
-
-                            is DashScopeServerEvent.CompletedTranscript -> {
-                                state = state
-                                    .withLanguage(event.language)
-                                    .appendCompleted(event.transcript)
-                                events.send(
-                                    Event.PartialTranscript(
-                                        transcript = state.completedText,
-                                        language = state.detectedLanguage,
-                                    ),
-                                )
+                                if (event.sentenceEnd) {
+                                    events.send(Event.EndOfSpeech)
+                                    requestFinish()
+                                }
                             }
 
                             is DashScopeServerEvent.Error -> {
@@ -273,14 +279,14 @@ internal class DashScopeRealtimeSession(
                                 throw DashScopeServerException(detail)
                             }
 
-                            DashScopeServerEvent.SessionFinished -> {
+                            DashScopeServerEvent.TaskFinished -> {
                                 audioCapture.stop()
                                 audioSenderJob?.join()
                                 events.send(
                                     Event.Completed(
                                         transcript = state.completedText
                                             .takeIf { it.isNotBlank() },
-                                        language = state.detectedLanguage,
+                                        language = null,
                                         speechDetected = state.speechDetected,
                                     ),
                                 )
@@ -500,16 +506,28 @@ internal class DashScopeRealtimeSession(
         val finishSent: Boolean = false,
         val speechDetected: Boolean = false,
         val completedText: String = "",
-        val detectedLanguage: String? = null,
     ) {
-        fun withLanguage(language: String?): SessionState =
-            language?.let { copy(detectedLanguage = it) } ?: this
-
         fun appendCompleted(transcript: String): SessionState =
             transcript
                 .takeIf { it.isNotBlank() }
-                ?.let { copy(completedText = completedText + it) }
+                ?.let {
+                    copy(
+                        completedText = TranscriptNormalizer.normalize(
+                            completedText + it,
+                        ),
+                    )
+                }
                 ?: this
+    }
+
+    private sealed interface OutboundMessage {
+        data class Command(
+            val command: DashScopeClientCommand,
+        ) : OutboundMessage
+
+        data class Audio(
+            val bytes: ByteArray,
+        ) : OutboundMessage
     }
 
     private class MalformedDashScopeEventException(
@@ -572,5 +590,5 @@ internal class DashScopeRealtimeSession(
 internal fun dashScopeEndpoint(baseUrl: String): Url =
     URLBuilder(baseUrl.trim()).apply {
         parameters.remove("model")
-        parameters.append("model", DashVoiceSettings.MODEL)
+        encodedPathSegments = listOf("api-ws", "v1", "inference")
     }.build()

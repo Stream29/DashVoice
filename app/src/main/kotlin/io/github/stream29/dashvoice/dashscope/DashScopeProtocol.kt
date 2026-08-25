@@ -1,6 +1,6 @@
 package io.github.stream29.dashvoice.dashscope
 
-import android.util.Base64
+import io.github.stream29.dashvoice.data.DashVoiceSettings
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -13,155 +13,154 @@ internal object DashScopeProtocol {
         ignoreUnknownKeys = true
     }
 
-    fun sessionUpdate(
+    fun newTaskId(): String = UUID.randomUUID().toString()
+
+    fun runTask(
+        taskId: String,
         vadThreshold: Double,
         silenceDurationMillis: Int,
-    ) = DashScopeClientEvent(
-        eventId = eventId(),
-        type = "session.update",
-        session = DashScopeSessionConfiguration(
-            inputAudioFormat = "pcm",
-            sampleRate = SAMPLE_RATE_HZ,
-            inputAudioTranscription = DashScopeInputAudioTranscription(),
-            turnDetection = DashScopeTurnDetection(
-                type = "server_vad",
-                threshold = vadThreshold,
-                silenceDurationMillis = silenceDurationMillis,
+    ) = DashScopeClientCommand(
+        header = DashScopeRequestHeader(
+            action = "run-task",
+            taskId = taskId,
+            streaming = "duplex",
+        ),
+        payload = DashScopeRequestPayload(
+            taskGroup = "audio",
+            task = "asr",
+            function = "recognition",
+            model = DashVoiceSettings.MODEL,
+            parameters = DashScopeRecognitionParameters(
+                format = "pcm",
+                sampleRate = SAMPLE_RATE_HZ,
+                maxSentenceSilence = silenceDurationMillis,
+                speechNoiseThreshold = vadThreshold,
             ),
+            input = DashScopeTaskInput(),
         ),
     )
 
-    fun appendAudio(
-        audio: ByteArray,
-        length: Int,
-    ) = DashScopeClientEvent(
-        eventId = eventId(),
-        type = "input_audio_buffer.append",
-        audio = Base64.encodeToString(
-            audio,
-            0,
-            length,
-            Base64.NO_WRAP,
+    fun finishTask(taskId: String) = DashScopeClientCommand(
+        header = DashScopeRequestHeader(
+            action = "finish-task",
+            taskId = taskId,
+            streaming = "duplex",
         ),
-    )
-
-    fun finish() = DashScopeClientEvent(
-        eventId = eventId(),
-        type = "session.finish",
+        payload = DashScopeRequestPayload(input = DashScopeTaskInput()),
     )
 
     fun parseServerEvent(message: String): DashScopeServerEvent {
         val event = json.decodeFromString<DashScopeServerEventEnvelope>(message)
-        return when (event.type) {
-            "session.created" -> DashScopeServerEvent.SessionCreated
-            "session.updated" -> DashScopeServerEvent.SessionUpdated
-            "input_audio_buffer.speech_started" -> DashScopeServerEvent.SpeechStarted
-            "input_audio_buffer.speech_stopped" -> DashScopeServerEvent.SpeechStopped
-            "conversation.item.input_audio_transcription.text" -> {
-                DashScopeServerEvent.PartialTranscript(
-                    text = event.text,
-                    stash = event.stash,
-                    language = event.language,
+        return when (event.header.event) {
+            "task-started" -> DashScopeServerEvent.TaskStarted
+            "result-generated" -> {
+                val sentence = event.payload.output?.sentence
+                    ?: return DashScopeServerEvent.Other(event.header.event)
+                DashScopeServerEvent.Transcript(
+                    text = sentence.text,
+                    sentenceEnd = sentence.sentenceEnd,
+                    heartbeat = sentence.heartbeat,
                 )
             }
 
-            "conversation.item.input_audio_transcription.completed" -> {
-                DashScopeServerEvent.CompletedTranscript(
-                    transcript = event.transcript,
-                    language = event.language,
-                )
-            }
+            "task-finished" -> DashScopeServerEvent.TaskFinished
+            "task-failed" -> DashScopeServerEvent.Error(
+                code = event.header.errorCode,
+                message = event.header.errorMessage,
+            )
 
-            "conversation.item.input_audio_transcription.failed",
-            "error",
-                -> {
-                DashScopeServerEvent.Error(
-                    code = event.error?.code,
-                    message = event.error?.message,
-                )
-            }
-
-            "session.finished" -> DashScopeServerEvent.SessionFinished
-            else -> DashScopeServerEvent.Other(event.type)
+            else -> DashScopeServerEvent.Other(event.header.event)
         }
     }
-
-    private fun eventId(): String =
-        "event_${UUID.randomUUID().toString().replace("-", "")}"
 
     const val SAMPLE_RATE_HZ = 16_000
 }
 
 @Serializable
-internal data class DashScopeClientEvent(
-    @SerialName("event_id")
-    val eventId: String,
-    val type: String,
-    val session: DashScopeSessionConfiguration? = null,
-    val audio: String? = null,
+internal data class DashScopeClientCommand(
+    val header: DashScopeRequestHeader,
+    val payload: DashScopeRequestPayload,
 )
 
 @Serializable
-internal data class DashScopeSessionConfiguration(
-    @SerialName("input_audio_format")
-    val inputAudioFormat: String,
+internal data class DashScopeRequestHeader(
+    val action: String,
+    @SerialName("task_id")
+    val taskId: String,
+    val streaming: String,
+)
+
+@Serializable
+internal data class DashScopeRequestPayload(
+    @SerialName("task_group")
+    val taskGroup: String = "",
+    val task: String = "",
+    val function: String = "",
+    val model: String = "",
+    val parameters: DashScopeRecognitionParameters? = null,
+    val input: DashScopeTaskInput,
+)
+
+@Serializable
+internal class DashScopeTaskInput
+
+@Serializable
+internal data class DashScopeRecognitionParameters(
+    val format: String,
     @SerialName("sample_rate")
     val sampleRate: Int,
-    @SerialName("input_audio_transcription")
-    val inputAudioTranscription: DashScopeInputAudioTranscription,
-    @SerialName("turn_detection")
-    val turnDetection: DashScopeTurnDetection,
-)
-
-@Serializable
-internal class DashScopeInputAudioTranscription
-
-@Serializable
-internal data class DashScopeTurnDetection(
-    val type: String,
-    val threshold: Double,
-    @SerialName("silence_duration_ms")
-    val silenceDurationMillis: Int,
+    @SerialName("max_sentence_silence")
+    val maxSentenceSilence: Int,
+    @SerialName("speech_noise_threshold")
+    val speechNoiseThreshold: Double,
 )
 
 @Serializable
 private data class DashScopeServerEventEnvelope(
-    val type: String,
-    val text: String = "",
-    val stash: String = "",
-    val transcript: String = "",
-    val language: String? = null,
-    val error: DashScopeErrorPayload? = null,
+    val header: DashScopeResponseHeader,
+    val payload: DashScopeResponsePayload = DashScopeResponsePayload(),
 )
 
 @Serializable
-private data class DashScopeErrorPayload(
-    val code: String? = null,
-    val message: String? = null,
+private data class DashScopeResponseHeader(
+    val event: String = "",
+    @SerialName("error_code")
+    val errorCode: String? = null,
+    @SerialName("error_message")
+    val errorMessage: String? = null,
+)
+
+@Serializable
+private data class DashScopeResponsePayload(
+    val output: DashScopeRecognitionOutput? = null,
+)
+
+@Serializable
+private data class DashScopeRecognitionOutput(
+    val sentence: DashScopeSentence? = null,
+)
+
+@Serializable
+private data class DashScopeSentence(
+    val text: String = "",
+    val heartbeat: Boolean = false,
+    @SerialName("sentence_end")
+    val sentenceEnd: Boolean = false,
 )
 
 internal sealed interface DashScopeServerEvent {
-    data object SessionCreated : DashScopeServerEvent
-    data object SessionUpdated : DashScopeServerEvent
-    data object SpeechStarted : DashScopeServerEvent
-    data object SpeechStopped : DashScopeServerEvent
-
-    data class PartialTranscript(
+    data object TaskStarted : DashScopeServerEvent
+    data class Transcript(
         val text: String,
-        val stash: String,
-        val language: String?,
+        val sentenceEnd: Boolean,
+        val heartbeat: Boolean,
     ) : DashScopeServerEvent
 
-    data class CompletedTranscript(
-        val transcript: String,
-        val language: String?,
-    ) : DashScopeServerEvent
-
+    data object TaskFinished : DashScopeServerEvent
     data class Error(
         val code: String?,
         val message: String?,
     ) : DashScopeServerEvent
 
-    data object SessionFinished : DashScopeServerEvent
     data class Other(val type: String) : DashScopeServerEvent
 }

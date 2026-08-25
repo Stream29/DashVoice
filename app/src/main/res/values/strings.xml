@@ -22,8 +22,7 @@
     <string name="section_dashscope_configuration">DashScope configuration</string>
     <string name="action_hide">Hide</string>
     <string name="action_show">Show</string>
-    <string name="base_url_help">Enter the workspace wss:// realtime endpoint. The model parameter is added
-        automatically.
+    <string name="base_url_help">Enter the workspace wss:// endpoint. DashVoice uses the /api-ws/v1/inference path.
     </string>
     <string name="language_automatic">Language: Automatic detection</string>
     <string name="vad_settings_title">Voice endpoint detection</string>

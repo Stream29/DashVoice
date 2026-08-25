@@ -89,13 +89,20 @@ class DashVoiceInputMethodService : InputMethodService() {
         setViewTreeSavedStateRegistryOwner(viewTreeOwners)
     }
 
+    override fun onStartInput(
+        attribute: EditorInfo?,
+        restarting: Boolean,
+    ) {
+        super.onStartInput(attribute, restarting)
+        viewModel.start()
+    }
+
     override fun onStartInputView(
         info: EditorInfo?,
         restarting: Boolean,
     ) {
         super.onStartInputView(info, restarting)
         viewTreeOwners.start()
-        viewModel.start()
     }
 
     override fun onFinishInputView(finishingInput: Boolean) {
@@ -103,6 +110,12 @@ class DashVoiceInputMethodService : InputMethodService() {
         clearComposingText()
         viewTreeOwners.stop()
         super.onFinishInputView(finishingInput)
+    }
+
+    override fun onFinishInput() {
+        viewModel.deactivate()
+        clearComposingText()
+        super.onFinishInput()
     }
 
     override fun onEvaluateFullscreenMode(): Boolean = false

@@ -19,7 +19,7 @@ data class DashVoiceSettings(
             hasValidVadConfiguration
 
     companion object {
-        const val MODEL = "qwen3-asr-flash-realtime"
+        const val MODEL = "qwen-audio-3.0-asr-flash-streaming"
         const val DEFAULT_VAD_THRESHOLD = 0.0
         const val MIN_VAD_THRESHOLD = -1.0
         const val MAX_VAD_THRESHOLD = 1.0
