@@ -8,7 +8,7 @@ import androidx.room.migration.Migration
 
 @Database(
     entities = [ConfigurationEntity::class],
-    version = 6,
+    version = 7,
     exportSchema = true,
 )
 abstract class DashVoiceDatabase : RoomDatabase() {
@@ -31,6 +31,7 @@ abstract class DashVoiceDatabase : RoomDatabase() {
                         MIGRATION_3_4,
                         MIGRATION_4_5,
                         MIGRATION_5_6,
+                        MIGRATION_6_7,
                     )
                     .build()
                     .also { instance = it }
@@ -99,6 +100,17 @@ abstract class DashVoiceDatabase : RoomDatabase() {
                 .replace("'", "''")
             database.execSQL(
                 "UPDATE configuration SET text_polish_prompt = '$defaultPrompt'",
+            )
+        }
+
+        private val MIGRATION_6_7 = Migration(6, 7) { database ->
+            val previousPrompt = DashVoiceSettings.PREVIOUS_DEFAULT_TEXT_POLISH_PROMPT
+                .replace("'", "''")
+            val revisedPrompt = DashVoiceSettings.DEFAULT_TEXT_POLISH_PROMPT
+                .replace("'", "''")
+            database.execSQL(
+                "UPDATE configuration SET text_polish_prompt = '$revisedPrompt' " +
+                    "WHERE text_polish_prompt = '$previousPrompt'",
             )
         }
     }

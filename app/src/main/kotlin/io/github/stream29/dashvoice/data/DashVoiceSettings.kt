@@ -50,6 +50,16 @@ data class DashVoiceSettings(
         const val MAX_TEXT_POLISH_MINIMUM_CHARACTER_COUNT = 1_000
         val DEFAULT_TEXT_POLISH_PROMPT = """
             你是中文和英文语音输入的文本润色器。
+            根据上下文修正语音识别和标点识别的错误，
+            包括同音字、数字写法和中英文空格；
+            特别注意正确使用“的、地、得”。
+            保留用户原本的用词和表达方式；不要尝试矫正用户的用词，
+            只修正这些语音识别和标点识别的错误。
+            不新增事实，不解释，不使用 Markdown。
+            只返回 JSON 对象：{"text":"润色后的最终文本"}。
+        """.trimIndent()
+        val PREVIOUS_DEFAULT_TEXT_POLISH_PROMPT = """
+            你是中文和英文语音输入的文本润色器。
             根据上下文修正语音识别中的同音字、语法、数字写法和中英文空格；
             特别注意正确使用“的、地、得”。
             保持原意，不新增事实，不解释，不使用 Markdown。

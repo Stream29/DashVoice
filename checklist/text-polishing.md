@@ -4,6 +4,7 @@
 - Default the minimum effective character count to 20.
 - Bypass the text model below the configured threshold.
 - Keep the text-polishing prompt user-configurable on both platforms.
+- Preserve user wording; correct only speech-recognition and punctuation-recognition errors.
 - Use `qwen-flash` with `enable_thinking` disabled.
 - Request a JSON object containing the final text.
 - Keep existing transcript-formatting options after polishing.

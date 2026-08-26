@@ -14,6 +14,7 @@ class DashVoiceSettingsTest {
         assertTrue(settings.semanticPunctuationEnabled)
         assertTrue(settings.textPolishMinimumCharacterCount == 20)
         assertTrue(settings.textPolishPrompt.isNotBlank())
+        assertTrue(settings.textPolishPrompt.contains("不要尝试矫正用户的用词"))
     }
 
     @Test
