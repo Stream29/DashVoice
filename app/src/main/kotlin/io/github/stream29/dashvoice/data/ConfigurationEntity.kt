@@ -21,6 +21,12 @@ data class ConfigurationEntity(
     val vadThreshold: Double,
     @ColumnInfo(name = "silence_duration_ms", defaultValue = "400")
     val silenceDurationMillis: Int,
+    @ColumnInfo(name = "remove_trailing_sentence_punctuation", defaultValue = "1")
+    val removeTrailingSentencePunctuation: Boolean,
+    @ColumnInfo(name = "remove_spaces_at_cjk_boundaries", defaultValue = "1")
+    val removeSpacesAtCjkBoundaries: Boolean,
+    @ColumnInfo(name = "semantic_punctuation_enabled", defaultValue = "1")
+    val semanticPunctuationEnabled: Boolean,
 ) {
     companion object {
         const val SINGLETON_ID = 1

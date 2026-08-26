@@ -37,6 +37,9 @@ class RoomConfigurationRepository(
             baseUrl = baseUrl,
             vadThreshold = vadThreshold,
             silenceDurationMillis = silenceDurationMillis,
+            removeTrailingSentencePunctuation = removeTrailingSentencePunctuation,
+            removeSpacesAtCjkBoundaries = removeSpacesAtCjkBoundaries,
+            semanticPunctuationEnabled = semanticPunctuationEnabled,
         )
 
     private fun DashVoiceSettings.toEntity(): ConfigurationEntity =
@@ -47,6 +50,9 @@ class RoomConfigurationRepository(
             vadPreset = CUSTOM_VAD,
             vadThreshold = vadThreshold,
             silenceDurationMillis = silenceDurationMillis,
+            removeTrailingSentencePunctuation = removeTrailingSentencePunctuation,
+            removeSpacesAtCjkBoundaries = removeSpacesAtCjkBoundaries,
+            semanticPunctuationEnabled = semanticPunctuationEnabled,
         )
 
     private companion object {

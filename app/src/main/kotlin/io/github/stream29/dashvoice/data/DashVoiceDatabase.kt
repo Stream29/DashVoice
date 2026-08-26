@@ -8,7 +8,7 @@ import androidx.room.migration.Migration
 
 @Database(
     entities = [ConfigurationEntity::class],
-    version = 2,
+    version = 4,
     exportSchema = true,
 )
 abstract class DashVoiceDatabase : RoomDatabase() {
@@ -25,7 +25,7 @@ abstract class DashVoiceDatabase : RoomDatabase() {
                     DashVoiceDatabase::class.java,
                     DATABASE_NAME,
                 )
-                    .addMigrations(MIGRATION_1_2)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                     .build()
                     .also { instance = it }
             }
@@ -53,6 +53,26 @@ abstract class DashVoiceDatabase : RoomDatabase() {
                     ELSE 400
                 END
                 """.trimIndent(),
+            )
+        }
+
+        private val MIGRATION_2_3 = Migration(2, 3) { database ->
+            database.execSQL(
+                "ALTER TABLE configuration " +
+                    "ADD COLUMN remove_trailing_sentence_punctuation " +
+                    "INTEGER NOT NULL DEFAULT 1",
+            )
+            database.execSQL(
+                "ALTER TABLE configuration " +
+                    "ADD COLUMN remove_spaces_at_cjk_boundaries " +
+                    "INTEGER NOT NULL DEFAULT 1",
+            )
+        }
+
+        private val MIGRATION_3_4 = Migration(3, 4) { database ->
+            database.execSQL(
+                "ALTER TABLE configuration " +
+                    "ADD COLUMN semantic_punctuation_enabled INTEGER NOT NULL DEFAULT 1",
             )
         }
     }

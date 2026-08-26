@@ -27,6 +27,12 @@ data class SettingsUiState(
     val vadThresholdInput: String = DashVoiceSettings.DEFAULT_VAD_THRESHOLD.toString(),
     val silenceDurationMillisInput: String =
         DashVoiceSettings.DEFAULT_SILENCE_DURATION_MILLIS.toString(),
+    val removeTrailingSentencePunctuation: Boolean =
+        DashVoiceSettings.DEFAULT_REMOVE_TRAILING_SENTENCE_PUNCTUATION,
+    val removeSpacesAtCjkBoundaries: Boolean =
+        DashVoiceSettings.DEFAULT_REMOVE_SPACES_AT_CJK_BOUNDARIES,
+    val semanticPunctuationEnabled: Boolean =
+        DashVoiceSettings.DEFAULT_SEMANTIC_PUNCTUATION_ENABLED,
     val apiKeyVisible: Boolean = false,
     val isSaving: Boolean = false,
     val microphonePermissionGranted: Boolean = false,
@@ -39,6 +45,9 @@ data class SettingsUiState(
             baseUrl = baseUrl,
             vadThreshold = vadThresholdInput.toDoubleOrNull() ?: Double.NaN,
             silenceDurationMillis = silenceDurationMillisInput.toIntOrNull() ?: Int.MIN_VALUE,
+            removeTrailingSentencePunctuation = removeTrailingSentencePunctuation,
+            removeSpacesAtCjkBoundaries = removeSpacesAtCjkBoundaries,
+            semanticPunctuationEnabled = semanticPunctuationEnabled,
         )
 }
 
@@ -89,6 +98,10 @@ class SettingsViewModel(
                     baseUrl = settings.baseUrl,
                     vadThresholdInput = settings.vadThreshold.toString(),
                     silenceDurationMillisInput = settings.silenceDurationMillis.toString(),
+                    removeTrailingSentencePunctuation =
+                        settings.removeTrailingSentencePunctuation,
+                    removeSpacesAtCjkBoundaries = settings.removeSpacesAtCjkBoundaries,
+                    semanticPunctuationEnabled = settings.semanticPunctuationEnabled,
                 )
             }
         }
@@ -115,6 +128,24 @@ class SettingsViewModel(
     fun onSilenceDurationMillisChanged(value: String) {
         mutableUiState.update {
             it.copy(silenceDurationMillisInput = value, statusMessageRes = null)
+        }
+    }
+
+    fun onRemoveTrailingSentencePunctuationChanged(value: Boolean) {
+        mutableUiState.update {
+            it.copy(removeTrailingSentencePunctuation = value, statusMessageRes = null)
+        }
+    }
+
+    fun onRemoveSpacesAtCjkBoundariesChanged(value: Boolean) {
+        mutableUiState.update {
+            it.copy(removeSpacesAtCjkBoundaries = value, statusMessageRes = null)
+        }
+    }
+
+    fun onSemanticPunctuationEnabledChanged(value: Boolean) {
+        mutableUiState.update {
+            it.copy(semanticPunctuationEnabled = value, statusMessageRes = null)
         }
     }
 
@@ -282,6 +313,10 @@ class SettingsViewModel(
                 baseUrl = settings.baseUrl.trim(),
                 vadThresholdInput = settings.vadThreshold.toString(),
                 silenceDurationMillisInput = settings.silenceDurationMillis.toString(),
+                removeTrailingSentencePunctuation =
+                    settings.removeTrailingSentencePunctuation,
+                removeSpacesAtCjkBoundaries = settings.removeSpacesAtCjkBoundaries,
+                semanticPunctuationEnabled = settings.semanticPunctuationEnabled,
                 statusMessageRes = if (saved) {
                     successMessageRes
                 } else {

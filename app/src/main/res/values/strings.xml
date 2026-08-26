@@ -26,6 +26,8 @@
     </string>
     <string name="language_automatic">Language: Automatic detection</string>
     <string name="vad_settings_title">Voice endpoint detection</string>
+    <string name="semantic_segmentation_label">Use semantic sentence segmentation</string>
+    <string name="semantic_segmentation_help">Uses sentence meaning instead of pauses. Finish voice input manually with the main button.</string>
     <string name="vad_silence_duration_label">End-of-speech silence (ms)</string>
     <string name="vad_silence_duration_help">200–6000 ms. Lower values finish sooner; higher values tolerate natural
         pauses.
@@ -34,6 +36,11 @@
     <string name="vad_threshold_help">-1.0–1.0. Lower values are more sensitive; higher values reject more background
         noise.
     </string>
+    <string name="transcript_formatting_title">Transcript formatting</string>
+    <string name="remove_trailing_punctuation_label">Remove trailing sentence punctuation</string>
+    <string name="remove_trailing_punctuation_help">Keeps punctuation between sentences and removes it only at the end of the completed input.</string>
+    <string name="remove_cjk_boundary_spaces_label">Remove spaces between CJK and English</string>
+    <string name="remove_cjk_boundary_spaces_help">Removes spaces at Chinese, Japanese, or Korean boundaries with English letters or numbers.</string>
     <string name="section_recognition_test">Recognition test</string>
     <string name="detected_language">Detected language: %1$s</string>
     <string name="action_test_again">Test again</string>

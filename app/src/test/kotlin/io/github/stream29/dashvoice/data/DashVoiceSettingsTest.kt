@@ -6,6 +6,15 @@ import org.junit.Test
 
 class DashVoiceSettingsTest {
     @Test
+    fun transcriptFormattingDefaultsPreserveExistingBehavior() {
+        val settings = DashVoiceSettings()
+
+        assertTrue(settings.removeTrailingSentencePunctuation)
+        assertTrue(settings.removeSpacesAtCjkBoundaries)
+        assertTrue(settings.semanticPunctuationEnabled)
+    }
+
+    @Test
     fun readyConfigurationRequiresApiKeyAndSecureWebSocketUrl() {
         assertTrue(
             DashVoiceSettings(

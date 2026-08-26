@@ -7,6 +7,12 @@ data class DashVoiceSettings(
     val baseUrl: String = "",
     val vadThreshold: Double = DEFAULT_VAD_THRESHOLD,
     val silenceDurationMillis: Int = DEFAULT_SILENCE_DURATION_MILLIS,
+    val removeTrailingSentencePunctuation: Boolean =
+        DEFAULT_REMOVE_TRAILING_SENTENCE_PUNCTUATION,
+    val removeSpacesAtCjkBoundaries: Boolean =
+        DEFAULT_REMOVE_SPACES_AT_CJK_BOUNDARIES,
+    val semanticPunctuationEnabled: Boolean =
+        DEFAULT_SEMANTIC_PUNCTUATION_ENABLED,
 ) {
     val hasValidVadConfiguration: Boolean
         get() = vadThreshold in MIN_VAD_THRESHOLD..MAX_VAD_THRESHOLD &&
@@ -26,6 +32,9 @@ data class DashVoiceSettings(
         const val DEFAULT_SILENCE_DURATION_MILLIS = 400
         const val MIN_SILENCE_DURATION_MILLIS = 200
         const val MAX_SILENCE_DURATION_MILLIS = 6_000
+        const val DEFAULT_REMOVE_TRAILING_SENTENCE_PUNCTUATION = true
+        const val DEFAULT_REMOVE_SPACES_AT_CJK_BOUNDARIES = true
+        const val DEFAULT_SEMANTIC_PUNCTUATION_ENABLED = true
 
         fun isValidBaseUrl(value: String): Boolean = runCatching {
             val uri = URI(value.trim())

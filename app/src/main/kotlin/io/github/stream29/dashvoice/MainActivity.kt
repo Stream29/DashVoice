@@ -49,6 +49,12 @@ class MainActivity : ComponentActivity() {
                     onVadThresholdChanged = viewModel::onVadThresholdChanged,
                     onSilenceDurationMillisChanged =
                         viewModel::onSilenceDurationMillisChanged,
+                    onRemoveTrailingSentencePunctuationChanged =
+                        viewModel::onRemoveTrailingSentencePunctuationChanged,
+                    onRemoveSpacesAtCjkBoundariesChanged =
+                        viewModel::onRemoveSpacesAtCjkBoundariesChanged,
+                    onSemanticPunctuationEnabledChanged =
+                        viewModel::onSemanticPunctuationEnabledChanged,
                     onRequestMicrophonePermission = viewModel::requestMicrophonePermission,
                     onSave = viewModel::save,
                     onStartTest = viewModel::startTest,

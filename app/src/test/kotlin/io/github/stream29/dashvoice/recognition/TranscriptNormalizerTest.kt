@@ -27,4 +27,51 @@ class TranscriptNormalizerTest {
             TranscriptNormalizer.normalize(" Kotlin   Native supports   Android "),
         )
     }
+
+    @Test
+    fun preservesWhitespaceAtCjkAndLatinBoundariesWhenConfigured() {
+        assertEquals(
+            "我使用 Kotlin Native 开发 Android 应用",
+            TranscriptNormalizer.normalize(
+                text = "我使用 Kotlin Native 开发 Android 应用",
+                removeSpacesAtCjkBoundaries = false,
+            ),
+        )
+    }
+
+    @Test
+    fun removesOnlyParagraphTrailingSentencePunctuation() {
+        assertEquals(
+            "第一句。第二句",
+            TranscriptNormalizer.finalize(
+                text = "第一句。第二句？！",
+                removeTrailingSentencePunctuation = true,
+                removeSpacesAtCjkBoundaries = true,
+            ),
+        )
+    }
+
+    @Test
+    fun preservesClosingQuotesAndBrackets() {
+        assertEquals(
+            "他说：“你好。”",
+            TranscriptNormalizer.finalize(
+                text = "他说：“你好。”",
+                removeTrailingSentencePunctuation = true,
+                removeSpacesAtCjkBoundaries = true,
+            ),
+        )
+    }
+
+    @Test
+    fun preservesTrailingPunctuationWhenConfigured() {
+        assertEquals(
+            "第一句。第二句？！",
+            TranscriptNormalizer.finalize(
+                text = "第一句。第二句？！",
+                removeTrailingSentencePunctuation = false,
+                removeSpacesAtCjkBoundaries = true,
+            ),
+        )
+    }
 }

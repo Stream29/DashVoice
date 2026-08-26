@@ -19,6 +19,7 @@ internal object DashScopeProtocol {
         taskId: String,
         vadThreshold: Double,
         silenceDurationMillis: Int,
+        semanticPunctuationEnabled: Boolean,
     ) = DashScopeClientCommand(
         header = DashScopeRequestHeader(
             action = "run-task",
@@ -35,6 +36,7 @@ internal object DashScopeProtocol {
                 sampleRate = SAMPLE_RATE_HZ,
                 maxSentenceSilence = silenceDurationMillis,
                 speechNoiseThreshold = vadThreshold,
+                semanticPunctuationEnabled = semanticPunctuationEnabled,
             ),
             input = DashScopeTaskInput(),
         ),
@@ -113,6 +115,8 @@ internal data class DashScopeRecognitionParameters(
     val maxSentenceSilence: Int,
     @SerialName("speech_noise_threshold")
     val speechNoiseThreshold: Double,
+    @SerialName("semantic_punctuation_enabled")
+    val semanticPunctuationEnabled: Boolean,
 )
 
 @Serializable

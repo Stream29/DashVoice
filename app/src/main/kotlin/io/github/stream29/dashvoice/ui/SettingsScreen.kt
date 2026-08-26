@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -49,6 +50,9 @@ fun SettingsScreen(
     onToggleApiKeyVisibility: () -> Unit,
     onVadThresholdChanged: (String) -> Unit,
     onSilenceDurationMillisChanged: (String) -> Unit,
+    onRemoveTrailingSentencePunctuationChanged: (Boolean) -> Unit,
+    onRemoveSpacesAtCjkBoundariesChanged: (Boolean) -> Unit,
+    onSemanticPunctuationEnabledChanged: (Boolean) -> Unit,
     onRequestMicrophonePermission: () -> Unit,
     onSave: () -> Unit,
     onStartTest: () -> Unit,
@@ -83,6 +87,12 @@ fun SettingsScreen(
                 onToggleApiKeyVisibility = onToggleApiKeyVisibility,
                 onVadThresholdChanged = onVadThresholdChanged,
                 onSilenceDurationMillisChanged = onSilenceDurationMillisChanged,
+                onRemoveTrailingSentencePunctuationChanged =
+                    onRemoveTrailingSentencePunctuationChanged,
+                onRemoveSpacesAtCjkBoundariesChanged =
+                    onRemoveSpacesAtCjkBoundariesChanged,
+                onSemanticPunctuationEnabledChanged =
+                    onSemanticPunctuationEnabledChanged,
                 onSave = onSave,
             )
 
@@ -177,6 +187,9 @@ private fun ConfigurationSection(
     onToggleApiKeyVisibility: () -> Unit,
     onVadThresholdChanged: (String) -> Unit,
     onSilenceDurationMillisChanged: (String) -> Unit,
+    onRemoveTrailingSentencePunctuationChanged: (Boolean) -> Unit,
+    onRemoveSpacesAtCjkBoundariesChanged: (Boolean) -> Unit,
+    onSemanticPunctuationEnabledChanged: (Boolean) -> Unit,
     onSave: () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
@@ -261,13 +274,24 @@ private fun ConfigurationSection(
             style = MaterialTheme.typography.titleSmall,
         )
 
+        SettingsSwitchRow(
+            title = stringResource(R.string.semantic_segmentation_label),
+            description = stringResource(R.string.semantic_segmentation_help),
+            checked = state.semanticPunctuationEnabled,
+            onCheckedChange = { value ->
+                onSemanticPunctuationEnabledChanged(value)
+                onSave()
+            },
+            enabled = !state.isLoading,
+        )
+
         OutlinedTextField(
             value = state.silenceDurationMillisInput,
             onValueChange = onSilenceDurationMillisChanged,
             modifier = Modifier
                 .fillMaxWidth()
                 .saveOnFocusLost(onSave),
-            enabled = !state.isLoading,
+            enabled = !state.isLoading && !state.semanticPunctuationEnabled,
             isError = !isSilenceDurationValid,
             label = { Text(stringResource(R.string.vad_silence_duration_label)) },
             supportingText = {
@@ -305,6 +329,33 @@ private fun ConfigurationSection(
             ),
         )
 
+        Text(
+            text = stringResource(R.string.transcript_formatting_title),
+            style = MaterialTheme.typography.titleSmall,
+        )
+
+        SettingsSwitchRow(
+            title = stringResource(R.string.remove_trailing_punctuation_label),
+            description = stringResource(R.string.remove_trailing_punctuation_help),
+            checked = state.removeTrailingSentencePunctuation,
+            onCheckedChange = { value ->
+                onRemoveTrailingSentencePunctuationChanged(value)
+                onSave()
+            },
+            enabled = !state.isLoading,
+        )
+
+        SettingsSwitchRow(
+            title = stringResource(R.string.remove_cjk_boundary_spaces_label),
+            description = stringResource(R.string.remove_cjk_boundary_spaces_help),
+            checked = state.removeSpacesAtCjkBoundaries,
+            onCheckedChange = { value ->
+                onRemoveSpacesAtCjkBoundariesChanged(value)
+                onSave()
+            },
+            enabled = !state.isLoading,
+        )
+
         state.statusMessageRes?.let {
             Text(
                 text = stringResource(it),
@@ -312,6 +363,35 @@ private fun ConfigurationSection(
                 style = MaterialTheme.typography.bodyMedium,
             )
         }
+    }
+}
+
+@Composable
+private fun SettingsSwitchRow(
+    title: String,
+    description: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    enabled: Boolean,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = title, style = MaterialTheme.typography.bodyLarge)
+            Text(
+                text = description,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            enabled = enabled,
+        )
     }
 }
 
@@ -439,6 +519,9 @@ private fun SettingsScreenPreview() {
             onToggleApiKeyVisibility = {},
             onVadThresholdChanged = {},
             onSilenceDurationMillisChanged = {},
+            onRemoveTrailingSentencePunctuationChanged = {},
+            onRemoveSpacesAtCjkBoundariesChanged = {},
+            onSemanticPunctuationEnabledChanged = {},
             onRequestMicrophonePermission = {},
             onSave = {},
             onStartTest = {},

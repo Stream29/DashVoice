@@ -15,6 +15,7 @@ class DashScopeProtocolTest {
             taskId = "task-id",
             vadThreshold = 0.0,
             silenceDurationMillis = 400,
+            semanticPunctuationEnabled = true,
         )
 
         val encoded = DashScopeProtocol.json.encodeToString(command)
@@ -36,6 +37,7 @@ class DashScopeProtocolTest {
         assertEquals("16000", parameters.getValue("sample_rate").toString())
         assertEquals("400", parameters.getValue("max_sentence_silence").toString())
         assertEquals("0.0", parameters.getValue("speech_noise_threshold").toString())
+        assertEquals("true", parameters.getValue("semantic_punctuation_enabled").toString())
         assertFalse(payload.containsKey("language_hints"))
         assertTrue(payload.getValue("input").jsonObject.isEmpty())
     }

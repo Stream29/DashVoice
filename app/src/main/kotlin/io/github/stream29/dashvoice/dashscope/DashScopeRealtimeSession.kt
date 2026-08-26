@@ -118,6 +118,8 @@ internal class DashScopeRealtimeSession(
                                     taskId = taskId,
                                     vadThreshold = settings.vadThreshold,
                                     silenceDurationMillis = settings.silenceDurationMillis,
+                                    semanticPunctuationEnabled =
+                                        settings.semanticPunctuationEnabled,
                                 ),
                             ),
                         )
@@ -252,7 +254,11 @@ internal class DashScopeRealtimeSession(
                                     events.send(Event.BeginningOfSpeech)
                                 }
                                 if (event.sentenceEnd) {
-                                    state = state.appendCompleted(event.text)
+                                    state = state.appendCompleted(
+                                        transcript = event.text,
+                                        removeSpacesAtCjkBoundaries =
+                                            settings.removeSpacesAtCjkBoundaries,
+                                    )
                                 }
                                 events.send(
                                     Event.PartialTranscript(
@@ -261,12 +267,13 @@ internal class DashScopeRealtimeSession(
                                         } else {
                                             TranscriptNormalizer.normalize(
                                                 state.completedText + event.text,
+                                                settings.removeSpacesAtCjkBoundaries,
                                             )
                                         },
                                         language = null,
                                     ),
                                 )
-                                if (event.sentenceEnd) {
+                                if (event.sentenceEnd && !settings.semanticPunctuationEnabled) {
                                     events.send(Event.EndOfSpeech)
                                     requestFinish()
                                 }
@@ -284,7 +291,13 @@ internal class DashScopeRealtimeSession(
                                 audioSenderJob?.join()
                                 events.send(
                                     Event.Completed(
-                                        transcript = state.completedText
+                                        transcript = TranscriptNormalizer.finalize(
+                                            text = state.completedText,
+                                            removeTrailingSentencePunctuation =
+                                                settings.removeTrailingSentencePunctuation,
+                                            removeSpacesAtCjkBoundaries =
+                                                settings.removeSpacesAtCjkBoundaries,
+                                        )
                                             .takeIf { it.isNotBlank() },
                                         language = null,
                                         speechDetected = state.speechDetected,
@@ -507,13 +520,17 @@ internal class DashScopeRealtimeSession(
         val speechDetected: Boolean = false,
         val completedText: String = "",
     ) {
-        fun appendCompleted(transcript: String): SessionState =
+        fun appendCompleted(
+            transcript: String,
+            removeSpacesAtCjkBoundaries: Boolean,
+        ): SessionState =
             transcript
                 .takeIf { it.isNotBlank() }
                 ?.let {
                     copy(
                         completedText = TranscriptNormalizer.normalize(
                             completedText + it,
+                            removeSpacesAtCjkBoundaries,
                         ),
                     )
                 }

@@ -23,10 +23,17 @@
     <string name="base_url_help">填写业务空间的 wss:// 接口地址；DashVoice 会使用 /api-ws/v1/inference 路径。</string>
     <string name="language_automatic">语言：自动识别</string>
     <string name="vad_settings_title">语音结束判定</string>
+    <string name="semantic_segmentation_label">使用语义断句</string>
+    <string name="semantic_segmentation_help">按语义而非停顿判断句子边界。请通过主按钮手动结束语音输入。</string>
     <string name="vad_silence_duration_label">结束静音时长（ms）</string>
     <string name="vad_silence_duration_help">范围 200–6000 ms。数值越小结束越快；越大越能容忍自然停顿。</string>
     <string name="vad_threshold_label">VAD 灵敏度阈值</string>
     <string name="vad_threshold_help">范围 -1.0–1.0。数值越低越敏感；越高越能排除背景噪声。</string>
+    <string name="transcript_formatting_title">转写格式</string>
+    <string name="remove_trailing_punctuation_label">去除句段末尾标点</string>
+    <string name="remove_trailing_punctuation_help">保留句子之间的标点，只删除本次输入末尾的标点。</string>
+    <string name="remove_cjk_boundary_spaces_label">去除中英文交界空格</string>
+    <string name="remove_cjk_boundary_spaces_help">去除中文、日文或韩文与英文字母、数字交界处的空格。</string>
     <string name="section_recognition_test">识别测试</string>
     <string name="detected_language">检测语言：%1$s</string>
     <string name="action_test_again">再次测试</string>
