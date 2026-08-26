@@ -25,6 +25,11 @@
     <string name="vad_settings_title">语音结束判定</string>
     <string name="semantic_segmentation_label">使用语义断句</string>
     <string name="semantic_segmentation_help">按语义而非停顿判断句子边界。请通过主按钮手动结束语音输入。</string>
+    <string name="text_polishing_title">文本润色</string>
+    <string name="text_polish_minimum_characters_label">触发文本润色的最小字符数</string>
+    <string name="text_polish_minimum_characters_help">只计算字母和数字。短于此长度直接上屏；达到此长度后使用 qwen-flash 润色。</string>
+    <string name="text_polish_prompt_label">文本润色提示词</string>
+    <string name="text_polish_prompt_help">会作为系统提示词发送；必须要求模型返回 {"text":"..."}。</string>
     <string name="vad_silence_duration_label">结束静音时长（ms）</string>
     <string name="vad_silence_duration_help">范围 200–6000 ms。数值越小结束越快；越大越能容忍自然停顿。</string>
     <string name="vad_threshold_label">VAD 灵敏度阈值</string>
@@ -95,6 +100,8 @@
     <string name="settings_validation_api_key">请输入 DashScope API Key。</string>
     <string name="settings_validation_base_url">请输入有效的 wss:// Base URL。</string>
     <string name="settings_validation_vad_threshold">VAD 灵敏度阈值必须介于 -1.0 与 1.0。</string>
+    <string name="settings_validation_text_polish_minimum_characters">文本润色最小字符数必须介于 1 与 1000。</string>
+    <string name="settings_validation_text_polish_prompt">请输入文本润色提示词。</string>
     <string name="settings_validation_silence_duration">结束静音时长必须介于 200 与 6000 ms。</string>
     <string name="settings_error_save_room">保存 Room 配置失败。</string>
 </resources>

@@ -26,4 +26,16 @@ class DashScopeEndpointTest {
         assertEquals("test", endpoint.parameters["workspace"])
         assertNull(endpoint.parameters["model"])
     }
+
+    @Test
+    fun webSocketBaseUrlUsesCompatibleTextPolishEndpoint() {
+        val endpoint = dashScopeTextPolishEndpoint(
+            "wss://workspace.example.com/api-ws/v1/inference?model=asr",
+        )
+
+        assertEquals("https", endpoint.protocol.name)
+        assertEquals("workspace.example.com", endpoint.host)
+        assertEquals("/compatible-mode/v1/chat/completions", endpoint.encodedPath)
+        assertNull(endpoint.parameters["model"])
+    }
 }

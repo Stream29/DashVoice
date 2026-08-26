@@ -8,7 +8,7 @@ import androidx.room.migration.Migration
 
 @Database(
     entities = [ConfigurationEntity::class],
-    version = 4,
+    version = 6,
     exportSchema = true,
 )
 abstract class DashVoiceDatabase : RoomDatabase() {
@@ -25,7 +25,13 @@ abstract class DashVoiceDatabase : RoomDatabase() {
                     DashVoiceDatabase::class.java,
                     DATABASE_NAME,
                 )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                    .addMigrations(
+                        MIGRATION_1_2,
+                        MIGRATION_2_3,
+                        MIGRATION_3_4,
+                        MIGRATION_4_5,
+                        MIGRATION_5_6,
+                    )
                     .build()
                     .also { instance = it }
             }
@@ -73,6 +79,26 @@ abstract class DashVoiceDatabase : RoomDatabase() {
             database.execSQL(
                 "ALTER TABLE configuration " +
                     "ADD COLUMN semantic_punctuation_enabled INTEGER NOT NULL DEFAULT 1",
+            )
+        }
+
+        private val MIGRATION_4_5 = Migration(4, 5) { database ->
+            database.execSQL(
+                "ALTER TABLE configuration " +
+                    "ADD COLUMN text_polish_minimum_character_count " +
+                    "INTEGER NOT NULL DEFAULT 20",
+            )
+        }
+
+        private val MIGRATION_5_6 = Migration(5, 6) { database ->
+            database.execSQL(
+                "ALTER TABLE configuration " +
+                    "ADD COLUMN text_polish_prompt TEXT NOT NULL DEFAULT ''",
+            )
+            val defaultPrompt = DashVoiceSettings.DEFAULT_TEXT_POLISH_PROMPT
+                .replace("'", "''")
+            database.execSQL(
+                "UPDATE configuration SET text_polish_prompt = '$defaultPrompt'",
             )
         }
     }

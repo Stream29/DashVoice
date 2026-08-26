@@ -40,6 +40,8 @@ class RoomConfigurationRepository(
             removeTrailingSentencePunctuation = removeTrailingSentencePunctuation,
             removeSpacesAtCjkBoundaries = removeSpacesAtCjkBoundaries,
             semanticPunctuationEnabled = semanticPunctuationEnabled,
+            textPolishMinimumCharacterCount = textPolishMinimumCharacterCount,
+            textPolishPrompt = textPolishPrompt,
         )
 
     private fun DashVoiceSettings.toEntity(): ConfigurationEntity =
@@ -53,6 +55,8 @@ class RoomConfigurationRepository(
             removeTrailingSentencePunctuation = removeTrailingSentencePunctuation,
             removeSpacesAtCjkBoundaries = removeSpacesAtCjkBoundaries,
             semanticPunctuationEnabled = semanticPunctuationEnabled,
+            textPolishMinimumCharacterCount = textPolishMinimumCharacterCount,
+            textPolishPrompt = textPolishPrompt,
         )
 
     private companion object {

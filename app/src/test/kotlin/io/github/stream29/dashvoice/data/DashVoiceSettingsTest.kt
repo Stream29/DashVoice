@@ -12,6 +12,8 @@ class DashVoiceSettingsTest {
         assertTrue(settings.removeTrailingSentencePunctuation)
         assertTrue(settings.removeSpacesAtCjkBoundaries)
         assertTrue(settings.semanticPunctuationEnabled)
+        assertTrue(settings.textPolishMinimumCharacterCount == 20)
+        assertTrue(settings.textPolishPrompt.isNotBlank())
     }
 
     @Test
@@ -74,6 +76,29 @@ class DashVoiceSettingsTest {
                 vadThreshold = 0.2,
                 silenceDurationMillis = 199,
             ).hasValidVadConfiguration,
+        )
+    }
+
+    @Test
+    fun textPolishMinimumCharacterCountMustStayWithinConfiguredRange() {
+        assertTrue(
+            DashVoiceSettings(
+                textPolishMinimumCharacterCount = 1_000,
+            ).hasValidTextPolishConfiguration,
+        )
+        assertFalse(
+            DashVoiceSettings(
+                textPolishMinimumCharacterCount = 0,
+            ).hasValidTextPolishConfiguration,
+        )
+    }
+
+    @Test
+    fun textPolishPromptMustNotBeBlank() {
+        assertFalse(
+            DashVoiceSettings(
+                textPolishPrompt = " ",
+            ).hasValidTextPolishConfiguration,
         )
     }
 }

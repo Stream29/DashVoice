@@ -9,6 +9,7 @@ import android.media.MediaRecorder
 import android.os.Build
 import android.util.Log
 import io.github.stream29.dashvoice.data.DashVoiceSettings
+import io.github.stream29.dashvoice.recognition.TranscriptPolishing
 import io.github.stream29.dashvoice.recognition.TranscriptNormalizer
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
@@ -291,14 +292,7 @@ internal class DashScopeRealtimeSession(
                                 audioSenderJob?.join()
                                 events.send(
                                     Event.Completed(
-                                        transcript = TranscriptNormalizer.finalize(
-                                            text = state.completedText,
-                                            removeTrailingSentencePunctuation =
-                                                settings.removeTrailingSentencePunctuation,
-                                            removeSpacesAtCjkBoundaries =
-                                                settings.removeSpacesAtCjkBoundaries,
-                                        )
-                                            .takeIf { it.isNotBlank() },
+                                        transcript = finalizeTranscript(state.completedText),
                                         language = null,
                                         speechDetected = state.speechDetected,
                                     ),
@@ -356,6 +350,36 @@ internal class DashScopeRealtimeSession(
             .onCompletion { cause ->
                 if (cause == null) emit(SessionInput.SocketClosed)
             }
+
+    private suspend fun finalizeTranscript(transcript: String): String? {
+        val finalizedTranscript = TranscriptNormalizer.finalize(
+            text = transcript,
+            removeTrailingSentencePunctuation = settings.removeTrailingSentencePunctuation,
+            removeSpacesAtCjkBoundaries = settings.removeSpacesAtCjkBoundaries,
+        ).takeIf { it.isNotBlank() } ?: return null
+        if (!TranscriptPolishing.shouldPolish(
+                transcript = finalizedTranscript,
+                minimumCharacterCount = settings.textPolishMinimumCharacterCount,
+            )
+        ) {
+            return finalizedTranscript
+        }
+
+        val polishedTranscript = try {
+            DashScopeTextPolisher.polish(finalizedTranscript, settings)
+        } catch (exception: CancellationException) {
+            throw exception
+        } catch (exception: Exception) {
+            Log.w(TAG, "Text polishing failed; using the ASR transcript", exception)
+            null
+        } ?: return finalizedTranscript
+
+        return TranscriptNormalizer.finalize(
+            text = polishedTranscript,
+            removeTrailingSentencePunctuation = settings.removeTrailingSentencePunctuation,
+            removeSpacesAtCjkBoundaries = settings.removeSpacesAtCjkBoundaries,
+        ).takeIf { it.isNotBlank() } ?: finalizedTranscript
+    }
 
     private fun audioFrames(): Flow<AudioFrame> = flow {
         val recorder = createAudioRecord()

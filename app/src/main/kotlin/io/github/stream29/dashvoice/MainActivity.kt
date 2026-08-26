@@ -55,6 +55,9 @@ class MainActivity : ComponentActivity() {
                         viewModel::onRemoveSpacesAtCjkBoundariesChanged,
                     onSemanticPunctuationEnabledChanged =
                         viewModel::onSemanticPunctuationEnabledChanged,
+                    onTextPolishMinimumCharacterCountChanged =
+                        viewModel::onTextPolishMinimumCharacterCountChanged,
+                    onTextPolishPromptChanged = viewModel::onTextPolishPromptChanged,
                     onRequestMicrophonePermission = viewModel::requestMicrophonePermission,
                     onSave = viewModel::save,
                     onStartTest = viewModel::startTest,

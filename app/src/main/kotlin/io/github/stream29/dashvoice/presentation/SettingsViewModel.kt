@@ -33,6 +33,9 @@ data class SettingsUiState(
         DashVoiceSettings.DEFAULT_REMOVE_SPACES_AT_CJK_BOUNDARIES,
     val semanticPunctuationEnabled: Boolean =
         DashVoiceSettings.DEFAULT_SEMANTIC_PUNCTUATION_ENABLED,
+    val textPolishMinimumCharacterCountInput: String =
+        DashVoiceSettings.DEFAULT_TEXT_POLISH_MINIMUM_CHARACTER_COUNT.toString(),
+    val textPolishPrompt: String = DashVoiceSettings.DEFAULT_TEXT_POLISH_PROMPT,
     val apiKeyVisible: Boolean = false,
     val isSaving: Boolean = false,
     val microphonePermissionGranted: Boolean = false,
@@ -48,6 +51,9 @@ data class SettingsUiState(
             removeTrailingSentencePunctuation = removeTrailingSentencePunctuation,
             removeSpacesAtCjkBoundaries = removeSpacesAtCjkBoundaries,
             semanticPunctuationEnabled = semanticPunctuationEnabled,
+            textPolishMinimumCharacterCount =
+                textPolishMinimumCharacterCountInput.toIntOrNull() ?: Int.MIN_VALUE,
+            textPolishPrompt = textPolishPrompt,
         )
 }
 
@@ -102,6 +108,9 @@ class SettingsViewModel(
                         settings.removeTrailingSentencePunctuation,
                     removeSpacesAtCjkBoundaries = settings.removeSpacesAtCjkBoundaries,
                     semanticPunctuationEnabled = settings.semanticPunctuationEnabled,
+                    textPolishMinimumCharacterCountInput =
+                        settings.textPolishMinimumCharacterCount.toString(),
+                    textPolishPrompt = settings.textPolishPrompt,
                 )
             }
         }
@@ -146,6 +155,18 @@ class SettingsViewModel(
     fun onSemanticPunctuationEnabledChanged(value: Boolean) {
         mutableUiState.update {
             it.copy(semanticPunctuationEnabled = value, statusMessageRes = null)
+        }
+    }
+
+    fun onTextPolishMinimumCharacterCountChanged(value: String) {
+        mutableUiState.update {
+            it.copy(textPolishMinimumCharacterCountInput = value, statusMessageRes = null)
+        }
+    }
+
+    fun onTextPolishPromptChanged(value: String) {
+        mutableUiState.update {
+            it.copy(textPolishPrompt = value, statusMessageRes = null)
         }
     }
 
@@ -293,6 +314,15 @@ class SettingsViewModel(
                         } != true ->
                             R.string.settings_validation_vad_threshold
 
+                        state.textPolishMinimumCharacterCountInput.toIntOrNull()?.let {
+                            it in DashVoiceSettings.MIN_TEXT_POLISH_MINIMUM_CHARACTER_COUNT..
+                                DashVoiceSettings.MAX_TEXT_POLISH_MINIMUM_CHARACTER_COUNT
+                        } != true ->
+                            R.string.settings_validation_text_polish_minimum_characters
+
+                        state.textPolishPrompt.isBlank() ->
+                            R.string.settings_validation_text_polish_prompt
+
                         else ->
                             R.string.settings_validation_silence_duration
                     },
@@ -317,6 +347,9 @@ class SettingsViewModel(
                     settings.removeTrailingSentencePunctuation,
                 removeSpacesAtCjkBoundaries = settings.removeSpacesAtCjkBoundaries,
                 semanticPunctuationEnabled = settings.semanticPunctuationEnabled,
+                textPolishMinimumCharacterCountInput =
+                    settings.textPolishMinimumCharacterCount.toString(),
+                textPolishPrompt = settings.textPolishPrompt,
                 statusMessageRes = if (saved) {
                     successMessageRes
                 } else {

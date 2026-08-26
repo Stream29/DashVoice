@@ -53,6 +53,8 @@ fun SettingsScreen(
     onRemoveTrailingSentencePunctuationChanged: (Boolean) -> Unit,
     onRemoveSpacesAtCjkBoundariesChanged: (Boolean) -> Unit,
     onSemanticPunctuationEnabledChanged: (Boolean) -> Unit,
+    onTextPolishMinimumCharacterCountChanged: (String) -> Unit,
+    onTextPolishPromptChanged: (String) -> Unit,
     onRequestMicrophonePermission: () -> Unit,
     onSave: () -> Unit,
     onStartTest: () -> Unit,
@@ -93,6 +95,9 @@ fun SettingsScreen(
                     onRemoveSpacesAtCjkBoundariesChanged,
                 onSemanticPunctuationEnabledChanged =
                     onSemanticPunctuationEnabledChanged,
+                onTextPolishMinimumCharacterCountChanged =
+                    onTextPolishMinimumCharacterCountChanged,
+                onTextPolishPromptChanged = onTextPolishPromptChanged,
                 onSave = onSave,
             )
 
@@ -190,6 +195,8 @@ private fun ConfigurationSection(
     onRemoveTrailingSentencePunctuationChanged: (Boolean) -> Unit,
     onRemoveSpacesAtCjkBoundariesChanged: (Boolean) -> Unit,
     onSemanticPunctuationEnabledChanged: (Boolean) -> Unit,
+    onTextPolishMinimumCharacterCountChanged: (String) -> Unit,
+    onTextPolishPromptChanged: (String) -> Unit,
     onSave: () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
@@ -201,7 +208,13 @@ private fun ConfigurationSection(
     val isSilenceDurationValid = silenceDurationMillis != null &&
         silenceDurationMillis in
         DashVoiceSettings.MIN_SILENCE_DURATION_MILLIS..
-        DashVoiceSettings.MAX_SILENCE_DURATION_MILLIS
+            DashVoiceSettings.MAX_SILENCE_DURATION_MILLIS
+    val textPolishMinimumCharacterCount =
+        state.textPolishMinimumCharacterCountInput.toIntOrNull()
+    val isTextPolishMinimumCharacterCountValid = textPolishMinimumCharacterCount != null &&
+        textPolishMinimumCharacterCount in
+        DashVoiceSettings.MIN_TEXT_POLISH_MINIMUM_CHARACTER_COUNT..
+        DashVoiceSettings.MAX_TEXT_POLISH_MINIMUM_CHARACTER_COUNT
 
     SettingsSection(title = stringResource(R.string.section_dashscope_configuration)) {
         OutlinedTextField(
@@ -283,6 +296,48 @@ private fun ConfigurationSection(
                 onSave()
             },
             enabled = !state.isLoading,
+        )
+
+        Text(
+            text = stringResource(R.string.text_polishing_title),
+            style = MaterialTheme.typography.titleSmall,
+        )
+
+        OutlinedTextField(
+            value = state.textPolishMinimumCharacterCountInput,
+            onValueChange = onTextPolishMinimumCharacterCountChanged,
+            modifier = Modifier
+                .fillMaxWidth()
+                .saveOnFocusLost(onSave),
+            enabled = !state.isLoading,
+            isError = !isTextPolishMinimumCharacterCountValid,
+            label = { Text(stringResource(R.string.text_polish_minimum_characters_label)) },
+            supportingText = {
+                Text(stringResource(R.string.text_polish_minimum_characters_help))
+            },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Next,
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = { focusManager.moveFocus(FocusDirection.Down) },
+            ),
+        )
+
+        OutlinedTextField(
+            value = state.textPolishPrompt,
+            onValueChange = onTextPolishPromptChanged,
+            modifier = Modifier
+                .fillMaxWidth()
+                .saveOnFocusLost(onSave),
+            enabled = !state.isLoading,
+            isError = state.textPolishPrompt.isBlank(),
+            label = { Text(stringResource(R.string.text_polish_prompt_label)) },
+            supportingText = {
+                Text(stringResource(R.string.text_polish_prompt_help))
+            },
+            minLines = 4,
         )
 
         OutlinedTextField(
@@ -522,6 +577,8 @@ private fun SettingsScreenPreview() {
             onRemoveTrailingSentencePunctuationChanged = {},
             onRemoveSpacesAtCjkBoundariesChanged = {},
             onSemanticPunctuationEnabledChanged = {},
+            onTextPolishMinimumCharacterCountChanged = {},
+            onTextPolishPromptChanged = {},
             onRequestMicrophonePermission = {},
             onSave = {},
             onStartTest = {},

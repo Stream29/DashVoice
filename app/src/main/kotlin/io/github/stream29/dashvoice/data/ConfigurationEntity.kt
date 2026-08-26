@@ -27,6 +27,10 @@ data class ConfigurationEntity(
     val removeSpacesAtCjkBoundaries: Boolean,
     @ColumnInfo(name = "semantic_punctuation_enabled", defaultValue = "1")
     val semanticPunctuationEnabled: Boolean,
+    @ColumnInfo(name = "text_polish_minimum_character_count", defaultValue = "20")
+    val textPolishMinimumCharacterCount: Int,
+    @ColumnInfo(name = "text_polish_prompt", defaultValue = "''")
+    val textPolishPrompt: String,
 ) {
     companion object {
         const val SINGLETON_ID = 1
