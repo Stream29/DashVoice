@@ -18,28 +18,17 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 internal object DashScopeTextPolisher {
     suspend fun polish(
         transcript: String,
         settings: DashVoiceSettings,
     ): String? {
-        val request = DashScopeTextPolishRequest(
-            messages = listOf(
-                DashScopeChatMessage(
-                    role = "system",
-                    content = settings.textPolishPrompt,
-                ),
-                DashScopeChatMessage(
-                    role = "user",
-                    content = transcript,
-                ),
-            ),
-        )
         val response = httpClient.post(dashScopeTextPolishEndpoint(settings.baseUrl)) {
             header(HttpHeaders.Authorization, "Bearer ${settings.apiKey}")
             contentType(ContentType.Application.Json)
-            setBody(DashScopeProtocol.json.encodeToString(request))
+            setBody(encodeTextPolishRequest(transcript, settings.textPolishPrompt))
         }
         val body = DashScopeProtocol.json.decodeFromString<DashScopeTextPolishResponse>(
             response.bodyAsText(),
@@ -70,6 +59,21 @@ internal object DashScopeTextPolisher {
     private const val REQUEST_TIMEOUT_MILLIS = 5_000L
 
 }
+
+private val textPolishRequestJson = Json(DashScopeProtocol.json) {
+    // Required wire parameters must be present even when they equal DTO defaults.
+    encodeDefaults = true
+}
+
+internal fun encodeTextPolishRequest(transcript: String, prompt: String): String =
+    textPolishRequestJson.encodeToString(
+        DashScopeTextPolishRequest(
+            messages = listOf(
+                DashScopeChatMessage(role = "system", content = prompt),
+                DashScopeChatMessage(role = "user", content = transcript),
+            ),
+        ),
+    )
 
 internal fun dashScopeTextPolishEndpoint(baseUrl: String): Url =
     URLBuilder(baseUrl.trim()).apply {

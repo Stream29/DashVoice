@@ -5,6 +5,61 @@ import org.junit.Test
 
 class TranscriptNormalizerTest {
     @Test
+    fun removesEverySpaceBetweenHanWords() {
+        assertEquals(
+            "我今天想测试中文输入",
+            TranscriptNormalizer.normalize("我 今天 想 测试 中 文 输 入"),
+        )
+    }
+
+    @Test
+    fun removesWhitespaceAndUnicodeSpacesBetweenHanCharacters() {
+        assertEquals(
+            "今天我们测试中文",
+            TranscriptNormalizer.normalize("今\t天\n我们\u00a0测试\u3000中文"),
+        )
+    }
+
+    @Test
+    fun removesHanSpacesWithoutRemovingEnglishWordSpaces() {
+        assertEquals(
+            "今天测试Kotlin Native和中文输入",
+            TranscriptNormalizer.normalize("今天 测试 Kotlin Native 和 中文 输入"),
+        )
+    }
+
+    @Test
+    fun preservesKoreanWordSpaces() {
+        assertEquals(
+            "한국어 문장 사이 공백",
+            TranscriptNormalizer.normalize("한국어 문장 사이 공백"),
+        )
+    }
+
+    @Test
+    fun preservesHanSpacesWhenFormattingIsDisabled() {
+        assertEquals(
+            "我 今天 想 测试 中文 输入",
+            TranscriptNormalizer.normalize(
+                "我 今天 想 测试 中文 输入",
+                removeSpacesAtCjkBoundaries = false,
+            ),
+        )
+    }
+
+    @Test
+    fun finalizesSpacedChineseAfterPolishing() {
+        assertEquals(
+            "今天我们测试中文输入",
+            TranscriptNormalizer.finalize(
+                "今天 我们 测试 中文 输入。",
+                removeTrailingSentencePunctuation = true,
+                removeSpacesAtCjkBoundaries = true,
+            ),
+        )
+    }
+
+    @Test
     fun removesWhitespaceAtCjkAndLatinBoundaries() {
         assertEquals(
             "我使用Kotlin Native开发Android应用",

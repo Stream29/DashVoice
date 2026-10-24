@@ -4,6 +4,7 @@ internal object TranscriptNormalizer {
     private const val CJK_CHARACTER =
         "[\\p{IsHan}\\p{IsHiragana}\\p{IsKatakana}\\p{IsHangul}]"
     private val whitespace = Regex("\\s+")
+    private val hanToHan = Regex("(\\p{IsHan})[\\s\\p{Zs}]+(?=\\p{IsHan})")
     private val cjkToLatinOrDigit = Regex("($CJK_CHARACTER)\\s+([A-Za-z0-9])")
     private val latinOrDigitToCjk = Regex("([A-Za-z0-9])\\s+($CJK_CHARACTER)")
     private val trailingSentencePunctuation = Regex("[。！？；：，、…．.!?;:]+$")
@@ -18,6 +19,7 @@ internal object TranscriptNormalizer {
 
         return if (removeSpacesAtCjkBoundaries) {
             normalized
+                .replace(hanToHan, "$1")
                 .replace(cjkToLatinOrDigit, "$1$2")
                 .replace(latinOrDigitToCjk, "$1$2")
         } else {

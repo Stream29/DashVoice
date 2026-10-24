@@ -374,6 +374,7 @@ internal class DashScopeRealtimeSession(
             null
         } ?: return finalizedTranscript
 
+        Log.i(TAG, "Text polishing completed")
         return TranscriptNormalizer.finalize(
             text = polishedTranscript,
             removeTrailingSentencePunctuation = settings.removeTrailingSentencePunctuation,
